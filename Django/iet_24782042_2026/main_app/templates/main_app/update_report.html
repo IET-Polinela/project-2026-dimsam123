@@ -3,5 +3,8 @@
 <form method="POST">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Update</button>
+    <button type="submit" class="btn btn-warning"
+        onclick="this.innerText='Loading...'; this.disabled=true;">
+    Update
+</button>
 </form>

@@ -1,7 +1,16 @@
-<h1>Tambah Laporan</h1>
+{% extends 'base.html' %}
+{% block content %}
 
-<form method="POST">
+<h2>Tambah Laporan</h2>
+
+<form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Simpan</button>
+
+    <button type="submit" class="btn btn-primary">
+        Submit
+    </button>
+    <a href="{% url 'report_list' %}" class="btn btn-secondary">Kembali</a>
 </form>
+
+{% endblock %}
