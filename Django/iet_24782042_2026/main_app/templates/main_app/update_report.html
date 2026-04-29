@@ -1,0 +1,10 @@
+<h1>Edit Laporan</h1>
+
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-warning"
+        onclick="this.innerText='Loading...'; this.disabled=true;">
+    Update
+</button>
+</form>
