@@ -1,0 +1,39 @@
+<input type="text" id="searchInput">
+<div id="result"></div>
+
+{% for report in reports %}
+    <p>{{ report.title }}</p>
+    <button class="btn-detail" data-id="{{ report.id }}">Detail</button>
+{% endfor %}
+
+let timeout = null;
+
+document.getElementById('searchInput').addEventListener('keyup', function() {
+    clearTimeout(timeout);
+
+    timeout = setTimeout(() => {
+        fetch(`/search/?q=${this.value}`)
+        .then(res => res.json())
+        .then(data => {
+            let html = '';
+            data.results.forEach(item => {
+                html += `<p>${item.title}</p>`;
+            });
+            document.getElementById('result').innerHTML = html;
+        });
+    }, 500);
+});
+
+<button class="btn-detail" data-id="{{ report.id }}">Detail</button>
+
+document.addEventListener('click', function(e){
+    if(e.target.classList.contains('btn-detail')){
+        const id = e.target.dataset.id;
+
+        fetch(`/detail/${id}/`)
+        .then(res => res.json())
+        .then(data => {
+            alert(data.title + " - " + data.status);
+        });
+    }
+});

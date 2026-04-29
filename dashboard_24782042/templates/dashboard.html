@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<h1>Dashboard</h1>
+
+<canvas id="statusChart"></canvas>
+<canvas id="categoryChart"></canvas>
+
+<script>
+fetch('/dashboard/data/')
+.then(res => res.json())
+.then(data => {
+
+    // STATUS
+    const statusLabels = data.status_data.map(item => item.status);
+    const statusCounts = data.status_data.map(item => item.count);
+
+    new Chart(document.getElementById('statusChart'), {
+        type: 'doughnut',
+        data: {
+            labels: statusLabels,
+            datasets: [{
+                data: statusCounts
+            }]
+        }
+    });
+
+    // CATEGORY
+    const categoryLabels = data.category_data.map(item => item.category);
+    const categoryCounts = data.category_data.map(item => item.count);
+
+    new Chart(document.getElementById('categoryChart'), {
+        type: 'bar',
+        data: {
+            labels: categoryLabels,
+            datasets: [{
+                data: categoryCounts
+            }]
+        }
+    });
+
+});
+</script>
+
+</body>
+</html>
