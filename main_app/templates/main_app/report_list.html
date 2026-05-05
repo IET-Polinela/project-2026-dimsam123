@@ -1,11 +1,7 @@
-<input type="text" id="searchInput">
+<input type="text" id="searchInput" placeholder="Search...">
 <div id="result"></div>
 
-{% for report in reports %}
-    <p>{{ report.title }}</p>
-    <button class="btn-detail" data-id="{{ report.id }}">Detail</button>
-{% endfor %}
-
+<script>
 let timeout = null;
 
 document.getElementById('searchInput').addEventListener('keyup', function() {
@@ -15,17 +11,22 @@ document.getElementById('searchInput').addEventListener('keyup', function() {
         fetch(`/search/?q=${this.value}`)
         .then(res => res.json())
         .then(data => {
+            console.log(data); // buat screenshot no 6
+
             let html = '';
             data.results.forEach(item => {
-                html += `<p>${item.title}</p>`;
+                html += `<p>${item.title} 
+                <button class="btn-detail" data-id="${item.id}">Detail</button>
+                </p>`;
             });
+
             document.getElementById('result').innerHTML = html;
         });
     }, 500);
 });
+</script>
 
-<button class="btn-detail" data-id="{{ report.id }}">Detail</button>
-
+<script>
 document.addEventListener('click', function(e){
     if(e.target.classList.contains('btn-detail')){
         const id = e.target.dataset.id;
@@ -37,3 +38,4 @@ document.addEventListener('click', function(e){
         });
     }
 });
+</script>

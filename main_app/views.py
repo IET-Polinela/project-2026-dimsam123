@@ -9,8 +9,30 @@ from django.views.generic import CreateView
 from django.contrib.auth import get_user_model
 from django.contrib.auth.views import LoginView, LogoutView
 from django.http import JsonResponse
-from .models import Report
 
+
+def detail_report(request, id):
+    d = Report.objects.get(id=id)
+
+    return JsonResponse({
+        'title': d.title,
+        'status': d.status,
+        'description': d.description
+    })
+
+def search_reports(request):
+    query = request.GET.get('q', '')
+    
+    reports = Report.objects.filter(title__icontains=query)
+
+    data = {
+        'results': [
+            {'id': r.id, 'title': r.title}
+            for r in reports
+        ]
+    }
+
+    return JsonResponse(data)
 
 
 class CustomLoginView(LoginView):
@@ -105,28 +127,24 @@ class ReportUpdateStatusView(View):
 
         return redirect('report_list')
     
-def search_reports(request):
-    query = request.GET.get('q', '')
-    
-    reports = Report.objects.filter(title__icontains=query)
+def report_detail_api(request, pk):
+    d = Report.objects.get(id=pk)
 
-    data = {
-        'results': [
-            {'id': r.id, 'title': r.title}
-            for r in reports
-        ]
-    }
-
-    return JsonResponse(data)
+    return JsonResponse({
+        'title': d.title,
+        'status': d.status,
+        'description': d.description
+    })
 
 def report_detail_api(request, pk):
     report = Report.objects.get(pk=pk)
 
     data = {
-        'title': report.title,
-        'status': report.status,
-        'description': report.description,
+        "title": report.title,
+        "description": report.description,
+        "location": report.location,
+        "status": report.status
     }
 
     return JsonResponse(data)
-    
+

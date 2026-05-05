@@ -25,7 +25,7 @@ def status_chart(request):
 
 # 📊 kategori chart
 def kategori_chart(request):
-    data = Report.objects.values('kategori').annotate(total=Count('id'))
+    data = Report.objects.values('category').annotate(total=Count('id'))
     return JsonResponse(list(data), safe=False)
 
 # 📋 last reports

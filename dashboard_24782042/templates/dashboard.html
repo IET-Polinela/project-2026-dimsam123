@@ -12,40 +12,73 @@
 <canvas id="categoryChart"></canvas>
 
 <script>
-fetch('/dashboard/data/')
+console.log("JS NYALA");
+
+document.addEventListener("click", function(e) {
+    if (e.target.classList.contains("btn-detail")) {
+        let id = e.target.dataset.id;
+
+        fetch(`/detail/${id}/`)
+        .then(res => res.json())
+        .then(data => {
+
+            document.getElementById("modal-title").innerText = data.title;
+            document.getElementById("modal-desc").innerText = data.description;
+            document.getElementById("modal-loc").innerText = data.location;
+
+            let status = document.getElementById("modal-status");
+            status.innerText = data.status;
+
+            // warna status
+            if (data.status === "RESOLVED") {
+                status.style.color = "green";
+            } else {
+                status.style.color = "red";
+            }
+
+            document.getElementById("modal").style.display = "block";
+        });
+    }
+});
+
+function closeModal() {
+    document.getElementById("modal").style.display = "none";
+}
+// STATUS
+fetch('/dashboard/api/status/')
 .then(res => res.json())
 .then(data => {
+    console.log("STATUS:", data);
+});
 
-    // STATUS
-    const statusLabels = data.status_data.map(item => item.status);
-    const statusCounts = data.status_data.map(item => item.count);
+// KATEGORI
+fetch('/dashboard/api/kategori/')
+.then(res => res.json())
+.then(data => {
+    console.log("KATEGORI:", data);
+});
 
-    new Chart(document.getElementById('statusChart'), {
-        type: 'doughnut',
-        data: {
-            labels: statusLabels,
-            datasets: [{
-                data: statusCounts
-            }]
+// LAST
+fetch('/dashboard/api/last/')
+.then(res => res.json())
+.then(data => {
+    console.log("LAST:", data);
+});
+
+document.getElementById("search").addEventListener("keyup", function() {
+    let keyword = this.value.toLowerCase();
+    let rows = document.querySelectorAll(".report-row");
+
+    rows.forEach(row => {
+        let text = row.innerText.toLowerCase();
+
+        if (text.includes(keyword)) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
         }
     });
-
-    // CATEGORY
-    const categoryLabels = data.category_data.map(item => item.category);
-    const categoryCounts = data.category_data.map(item => item.count);
-
-    new Chart(document.getElementById('categoryChart'), {
-        type: 'bar',
-        data: {
-            labels: categoryLabels,
-            datasets: [{
-                data: categoryCounts
-            }]
-        }
-    });
-
 });
 </script>
-
 </body>
 </html>
