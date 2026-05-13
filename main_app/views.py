@@ -148,3 +148,17 @@ def report_detail_api(request, pk):
 
     return JsonResponse(data)
 
+from rest_framework import generics, permissions
+from .models import Report
+from .serializers import ReportSerializer
+
+class ReportListCreateView(generics.ListCreateAPIView):
+    queryset = Report.objects.all()
+    serializer_class = ReportSerializer
+    
+    # Supaya hanya user yang login yang bisa lapor
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        # Otomatis ngeset pelapor sesuai user yang lagi login
+        serializer.save(reporter=self.request.user)

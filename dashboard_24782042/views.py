@@ -3,7 +3,7 @@ from main_app.models import Report
 from django.db.models import Count
 from django.shortcuts import render
 from django.http import JsonResponse
-from main_app.models import Report  # sesuaikan kalau nama model beda
+from main_app.models import Report
 
 def status_chart(request):
     data = Report.objects.values('status').order_by('-id').distinct('status')

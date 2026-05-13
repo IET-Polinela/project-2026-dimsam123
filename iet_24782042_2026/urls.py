@@ -4,6 +4,8 @@ from usermanagement_24782042.views import RegisterView
 from main_app.views import CustomLoginView, CustomLogoutView
 from django.contrib import admin
 from django.urls import path, include
+from django.contrib import admin
+from django.urls import path, include
 
 urlpatterns = [
     path('login/', CustomLoginView.as_view(), name='login'),
@@ -12,4 +14,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('main_app.urls')),
     path('dashboard/', include('dashboard_24782042.urls')),
+    path('api/', include('main_app.api_urls')),
 ]
