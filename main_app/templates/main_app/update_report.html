@@ -1,10 +1,10 @@
 <h1>Edit Laporan</h1>
 
-<form method="POST">
+<form method="POST" onsubmit="document.getElementById('btn-update').innerText='Loading...'; document.getElementById('btn-update').disabled=true;">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit" class="btn btn-warning"
-        onclick="this.innerText='Loading...'; this.disabled=true;">
-    Update
-</button>
+    
+    <button type="submit" id="btn-update" class="btn btn-warning">
+        Update
+    </button>
 </form>
