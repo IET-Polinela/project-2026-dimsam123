@@ -1,4 +1,13 @@
-from django.urls import path
+from rest_framework.routers import DefaultRouter
+from main_app.views import ReportViewSet
+
+router = DefaultRouter()
+router.register(
+    r'reports',
+    ReportViewSet,
+    basename='reports'
+)
+from django.urls import include, path
 from . import views
 from .views import (
     ReportListView,
@@ -21,10 +30,10 @@ urlpatterns = [
     path('update/<int:pk>/', ReportUpdateView.as_view(), name='update_report'),
     path('delete/<int:pk>/', ReportDeleteView.as_view(), name='delete_report'),
     path('update-status/<int:pk>/', ReportUpdateStatusView.as_view(), name='update_status'),
-
-    # 🔥 API Detail yang dipakai oleh Javascript/AJAX di Web HTML kamu
     path('api/detail/<int:pk>/', views.report_detail_api, name='detail_api'),
-
-    # 🔍 Search Feature yang dipakai di Web HTML kamu
     path('search/', views.search_reports, name='search'),
+    path(
+        'api/',
+        include(router.urls)
+    ),
 ]

@@ -1,34 +1,23 @@
-"""
-URL configuration for iet_24782042_2026 project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/6.0/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from usermanagement_24782042.views import RegisterView
+from main_app.views import CustomLoginView, CustomLogoutView
+from django.contrib import admin
+from django.urls import path, include
+from django.contrib import admin
+from django.urls import path, include
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from usermanagement_24782042.api_views import RegisterView
 
 urlpatterns = [
+    path('login/', CustomLoginView.as_view(), name='login'),
+    path('logout/', CustomLogoutView.as_view(), name='logout'),
+    path('register/', RegisterView.as_view(), name='register'),
     path('admin/', admin.site.urls),
-]
-
-from django.contrib import admin
-from django.urls import path
-from django.http import HttpResponse
-
-def welcome(request):
-    return HttpResponse("Selamat Datang")
-
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('welcome/', welcome),
+    path('', include('main_app.urls')),
+    path('dashboard/', include('dashboard_24782042.urls')),
+    path('api/', include('main_app.api_urls')),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/register/', RegisterView.as_view(), name='auth_register'),
 ]

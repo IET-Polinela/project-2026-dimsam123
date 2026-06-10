@@ -17,6 +17,11 @@ from rest_framework.exceptions import PermissionDenied as DRFPermissionDenied
 from django.db.models import Q
 from .permissions import IsCitizenOwnerOrAdminReadOnlyStatus
 from .serializers import ReportSerializer
+from rest_framework import viewsets
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated
+from .models import Report
+
 
 User = get_user_model()
 
@@ -159,78 +164,56 @@ class ReportUpdateStatusView(AdminRequiredMixin, View):
         return redirect('report_list')
 
 
-# =====================================================================
-# 3. ENDPOINT API REST FRAMEWORK (POSTMAN) - 100% SINKRON PAPAN TULIS
-# =====================================================================
+class ReportPagination(PageNumberPagination):
+
+    page_size = 10
+    page_size_query_param = 'page_size'
+
+    def get_paginated_response(self, data):
+
+        return Response({
+            'count': self.page.paginator.count,
+            'current_page': self.page.number,
+            'next': self.get_next_link(),
+            'previous': self.get_previous_link(),
+            'results': data
+        })
+
 
 class ReportViewSet(viewsets.ModelViewSet):
     serializer_class = ReportSerializer
+    pagination_class = ReportPagination
+    permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
+        queryset = Report.objects.all().order_by('-updated_at')
+        tab = self.request.query_params.get('tab')
+
         user = self.request.user
-        
-        # Admin ==> exclude DRAFT
-        if user.is_superuser:
-            return Report.objects.exclude(status='DRAFT')
-        
-        # Citizen ==> Milik sendiri ATAU Laporan umum yang bukan DRAFT
-        return Report.objects.filter(
-            Q(reporter=user) | ~Q(status='DRAFT')
-        )
 
-    def get_permissions(self):
-        return [permissions.IsAuthenticated(), IsCitizenOwnerOrAdminReadOnlyStatus()]
+        # MY REPORTS
+        if tab == 'my_reports':
+            if user.is_authenticated:
+                return queryset.filter(reporter=user)
+            return queryset.none()
 
-    def create(self, request, *args, **kwargs):
-        if request.user.is_superuser:
-            return Response(
-                {"detail": "Admin tidak diperbolehkan membuat laporan warga."},
-                status=status.HTTP_403_FORBIDDEN
-            )
-        return super().create(request, *args, **kwargs)
+        # FEED
+        if tab == 'feed':
+            feed_queryset = queryset.exclude(status='DRAFT')
+
+            if user.is_authenticated:
+                return feed_queryset.exclude(reporter=user)
+
+            return feed_queryset
+
+        # DEFAULT (fallback aman)
+        return queryset
 
     def perform_create(self, serializer):
-        serializer.save(reporter=self.request.user)
-
-    def update(self, request, *args, **kwargs):
-        instance = self.get_object()
-        
-        if request.user.is_superuser:
-            status_baru = request.data.get('status')
-            if not status_baru:
-                return Response(
-                    {"detail": "Admin hanya boleh mengubah field 'status'."}, 
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            
-            data_admin = {
-                'title': instance.title,
-                'description': instance.description,
-                'category': instance.category,
-                'location': instance.location,
-                'status': status_baru
-            }
-            serializer = self.get_serializer(instance, data=data_admin)
-            serializer.is_valid(raise_exception=True)
-            self.perform_update(serializer)
-            return Response(serializer.data)
-            
-        if instance.reporter != request.user:
-            raise DRFPermissionDenied("Anda hanya boleh mengubah laporan milik sendiri.")
-            
-        return super().update(request, *args, **kwargs)
-
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        
-        if request.user.is_superuser:
-            raise DRFPermissionDenied("Admin tidak diperbolehkan menghapus laporan warga.")
-            
-        if instance.reporter != request.user:
-            raise DRFPermissionDenied("Anda hanya boleh menghapus laporan milik sendiri.")
-            
-        return super().destroy(request, *args, **kwargs)
-
+        if self.request.user.is_authenticated:
+            serializer.save(reporter=self.request.user)
+        else:
+            serializer.save(reporter=None)
 
 # =====================================================================
 # 4. KODE LAMA FUNGSIONAL (AGAR URLS.PY TIDAK EROR)
@@ -264,3 +247,5 @@ def report_detail_api(request, pk):
         "status": report.status
     }
     return JsonResponse(data)
+
+
