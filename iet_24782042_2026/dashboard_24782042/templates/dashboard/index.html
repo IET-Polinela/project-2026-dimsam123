@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<h1>Dashboard</h1>
+
+<!-- chart -->
+<canvas id="statusChart"></canvas>
+<canvas id="kategoriChart"></canvas>
+
+<!-- tabel -->
+<h3>Last Reported</h3>
+<table border="1">
+  <tbody id="reported-body"></tbody>
+</table>
+
+<h3>Last Resolved</h3>
+<table border="1">
+  <tbody id="resolved-body"></tbody>
+</table>
+
+<!-- 🔥 INI YANG KURANG -->
+<script>
+
+// 📊 STATUS CHART
+fetch('/dashboard/api/status/')
+.then(res => res.json())
+.then(data => {
+    const labels = data.map(d => d.status);
+    const values = data.map(d => d.total);
+
+    new Chart(document.getElementById('statusChart'), {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{ data: values }]
+        }
+    });
+});
+
+// 📊 KATEGORI CHART
+fetch('/dashboard/api/kategori/')
+.then(res => res.json())
+.then(data => {
+    const labels = data.map(d => d.category);
+    const values = data.map(d => d.total);
+
+    new Chart(document.getElementById('kategoriChart'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{ data: values }]
+        }
+    });
+});
+
+// 📋 LAST DATA
+fetch('/dashboard/api/last/')
+.then(res => res.json())
+.then(data => {
+
+    let rep = '';
+    data.reported.forEach(r => {
+        rep += `<tr><td>${r.title}</td></tr>`;
+    });
+    document.getElementById('reported-body').innerHTML = rep;
+
+    let reso = '';
+    data.resolved.forEach(r => {
+        reso += `<tr><td>${r.title}</td></tr>`;
+    });
+    document.getElementById('resolved-body').innerHTML = reso;
+
+});
+
+fetch('/dashboard/api/status/')
+.then(res => res.json())
+.then(data => {
+    console.log(data); // WAJIB INI
+});
+
+
+</script>
+<div id="modal" style="display:none; position:fixed; top:20%; left:30%; background:white; padding:20px; border:1px solid black;">
+    <h3 id="modal-title"></h3>
+    <p id="modal-desc"></p>
+    <p id="modal-loc"></p>
+    <span id="modal-status"></span>
+    <br><br>
+    <button onclick="closeModal()">Tutup</button>
+</div>
+</body>
+</html>

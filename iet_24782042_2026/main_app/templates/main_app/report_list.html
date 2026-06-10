@@ -1,0 +1,41 @@
+<input type="text" id="searchInput" placeholder="Search...">
+<div id="result"></div>
+
+<script>
+let timeout = null;
+
+document.getElementById('searchInput').addEventListener('keyup', function() {
+    clearTimeout(timeout);
+
+    timeout = setTimeout(() => {
+        fetch(`/search/?q=${this.value}`)
+        .then(res => res.json())
+        .then(data => {
+            console.log(data); // buat screenshot no 6
+
+            let html = '';
+            data.results.forEach(item => {
+                html += `<p>${item.title} 
+                <button class="btn-detail" data-id="${item.id}">Detail</button>
+                </p>`;
+            });
+
+            document.getElementById('result').innerHTML = html;
+        });
+    }, 500);
+});
+</script>
+
+<script>
+document.addEventListener('click', function(e){
+    if(e.target.classList.contains('btn-detail')){
+        const id = e.target.dataset.id;
+
+        fetch(`/detail/${id}/`)
+        .then(res => res.json())
+        .then(data => {
+            alert(data.title + " - " + data.status);
+        });
+    }
+});
+</script>
