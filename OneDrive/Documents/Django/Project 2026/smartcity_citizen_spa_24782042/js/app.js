@@ -1,5 +1,5 @@
 // PASTIKAN BARIS PERTAMA INI MEMAKAI URL LENGKAP KE PORT 8000
-const API_URL = 'http://127.0.0.1:8000/api/reports/';
+const API_URL = 'http://103.151.63.85:8010/api/reports/';
 
 let currentTab = 'feed';
 let editingReportId = null;
