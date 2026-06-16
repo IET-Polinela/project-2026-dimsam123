@@ -1,4 +1,4 @@
-const BACKEND_URL = "http://103.151.63.85:8010";
+const BASE_URL = "http://103.151.63.85:8010";
 
 async function requestAPI(endpoint, options = {}) {
     // Ambil token dari localStorage
@@ -13,6 +13,6 @@ async function requestAPI(endpoint, options = {}) {
         options.headers['Authorization'] = `Bearer ${accessToken}`;
     }
 
-    const response = await fetch(`${BACKEND_URL}${endpoint}`, options);
+    const response = await fetch(`${BASE_URL}${endpoint}`, options);
     return response;
 }
