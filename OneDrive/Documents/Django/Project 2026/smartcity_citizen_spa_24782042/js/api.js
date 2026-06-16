@@ -1,4 +1,4 @@
-const BACKEND_URL = 'http://127.0.0.1:8000';
+const BACKEND_URL = "http://103.151.63.85:8010";
 
 async function requestAPI(endpoint, options = {}) {
     // Ambil token dari localStorage
