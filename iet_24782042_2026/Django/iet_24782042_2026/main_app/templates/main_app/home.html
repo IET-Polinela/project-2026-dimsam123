@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+
+<h1 class="mb-3">IET Report Home</h1>
+
+<div class="mb-3">
+    <a href="{% url 'add_report' %}" class="btn btn-primary">+ Tambah Laporan</a>
+</div>
+
+<h2>Daftar Laporan</h2>
+
+<div class="table-responsive"> <!-- ✅ ini bikin responsive -->
+<table class="table table-bordered table-hover">
+    <thead class="table-dark text-center">
+        <tr>
+            <th>Judul</th>
+            <th>Lokasi</th>
+            <th>Status</th>
+            <th>Aksi</th>
+        </tr>
+    </thead>
+
+    <tbody>
+    {% for report in reports %}
+        <tr>
+            <td>{{ report.title }}</td>
+            <td>{{ report.location }}</td>
+
+            <td class="text-center">
+                {% if report.status == 'REPORTED' %}
+                    <span class="badge bg-secondary">REPORTED</span>
+                {% elif report.status == 'VERIFIED' %}
+                    <span class="badge bg-info">VERIFIED</span>
+                {% elif report.status == 'IN_PROGRESS' %}
+                    <span class="badge bg-warning text-dark">IN PROGRESS</span>
+                {% elif report.status == 'RESOLVED' %}
+                    <span class="badge bg-success">RESOLVED</span>
+                {% endif %}
+            </td>
+
+            <td>
+                <a href="{% url 'update_report' report.id %}" class="btn btn-warning btn-sm mb-1">Edit</a>
+                
+                <a href="{% url 'delete_report' report.id %}" 
+                   class="btn btn-danger btn-sm mb-1"
+                   onclick="return confirm('Yakin mau hapus?')">
+                   Hapus
+                </a>
+
+                <!-- WORKFLOW BUTTON -->
+                {% if report.status == 'REPORTED' %}
+                <form method="post" action="{% url 'update_status' report.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="status" value="VERIFIED">
+                    <button type="submit" class="btn btn-info btn-sm w-100 mt-1">Verifikasi</button>
+                </form>
+
+                {% elif report.status == 'VERIFIED' %}
+                <form method="post" action="{% url 'update_status' report.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="status" value="IN_PROGRESS">
+                    <button type="submit" class="btn btn-warning btn-sm w-100 mt-1">Proses</button>
+                </form>
+
+                {% elif report.status == 'IN_PROGRESS' %}
+                <form method="post" action="{% url 'update_status' report.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="status" value="RESOLVED">
+                    <button type="submit" class="btn btn-success btn-sm w-100 mt-1">Selesai</button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+
+    {% empty %}
+        <!-- ✅ EMPTY STATE BAGUS -->
+        <tr>
+            <td colspan="4" class="text-center p-4">
+                <h5>Belum ada laporan 😢</h5>
+                <p>Silakan tambah laporan pertama kamu</p>
+                <a href="{% url 'add_report' %}" class="btn btn-primary">+ Tambah Laporan</a>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+
+</div>
+
+{% endblock %}
