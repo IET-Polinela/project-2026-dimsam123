@@ -1,0 +1,13 @@
+# Mengabaikan folder environment
+venv/
+env/
+
+# Mengabaikan file database lokal
+db.sqlite3
+
+# Mengabaikan cache python
+__pycache__/
+*.pyc
+
+# Mengabaikan file rahasia (kalau kamu pakai)
+.env

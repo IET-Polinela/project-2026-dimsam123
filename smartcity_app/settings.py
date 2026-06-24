@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'usermanagement_24782042',
     'dashboard_24782042',
     'rest_framework',
+    'drf_spectacular',
+    'django_scalar',
     'rest_framework_simplejwt',
     'corsheaders'
 ]
@@ -147,3 +149,7 @@ REST_FRAMEWORK = {
 }
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
